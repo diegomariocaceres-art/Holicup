@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acarreos Holi Cup</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e 0%,#0d2137 50%,#0a1a0f 100%); font-family:Georgia,serif; color:#e8dcc8; min-height:100vh; }
+.header { background:linear-gradient(180deg,#1a3a1a 0%,#0d2137 100%); border-bottom:3px solid #c8a84b; padding:32px 20px 20px; text-align:center; }
+.copa { font-size:13px; letter-spacing:4px; color:#c8a84b; margin-bottom:8px; }
+h1 { font-size:clamp(28px,7vw,52px); font-weight:900; color:#fff; line-height:1.1; }
+h1 span { color:#c8a84b; }
+.stats { margin-top:16px; display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+.stat { background:rgba(200,168,75,0.1); border:1px solid rgba(200,168,75,0.3); border-radius:8px; padding:8px 16px; text-align:center; }
+.stat-val { font-size:20px; font-weight:bold; color:#c8a84b; }
+.stat-lbl { font-size:11px; color:#9aa; letter-spacing:1px; }
+.tabs { display:flex; border-bottom:1px solid rgba(200,168,75,0.2); background:rgba(0,0,0,0.3); }
+.tab { flex:1; padding:14px; background:none; border:none; color:#888; border-bottom:3px solid transparent; cursor:pointer; font-family:inherit; font-size:13px; letter-spacing:2px; text-transform:uppercase; }
+.tab.active { color:#c8a84b; border-bottom:3px solid #c8a84b; font-weight:bold; }
+.content { padding:16px; max-width:700px; margin:0 auto; }
+.player-card { margin-bottom:8px; border-radius:12px; border:1px solid rgba(200,168,75,0.15); background:rgba(255,255,255,0.04); cursor:pointer; overflow:hidden; }
+.player-card.gold { border-color:rgba(255,215,0,0.4); background:linear-gradient(135deg,rgba(255,215,0,0.12) 0%,rgba(0,0,0,0.4) 100%); }
+.player-card.silver { border-color:rgba(192,192,192,0.4); background:linear-gradient(135deg,rgba(192,192,192,0.12) 0%,rgba(0,0,0,0.4) 100%); }
+.player-card.bronze { border-color:rgba(205,127,50,0.4); background:linear-gradient(135deg,rgba(205,127,50,0.12) 0%,rgba(0,0,0,0.4) 100%); }
+.player-row { display:flex; align-items:center; padding:14px 16px; gap:14px; }
+.pos { width:36px; text-align:center; font-weight:900; color:#667; flex-shrink:0; font-size:18px; }
+.pos.top { font-size:24px; }
+.name { flex:1; font-weight:700; font-size:16px; }
+.name.gold { color:#FFD700; }
+.name.silver { color:#C0C0C0; }
+.name.bronze { color:#CD7F32; }
+.sub { font-size:11px; color:#777; margin-top:2px; }
+.need { color:#c87a4b; }
+.ok { color:#4bc87a; }
+.pts-col { text-align:right; flex-shrink:0; }
+.pts-num { font-size:24px; font-weight:900; color:#c8a84b; }
+.pts-num.gold { color:#FFD700; }
+.pts-num.silver { color:#C0C0C0; }
+.pts-num.bronze { color:#CD7F32; }
+.pts-lbl { font-size:10px; color:#777; letter-spacing:1px; }
+.arrow { color:#555; font-size:12px; }
+.detail { border-top:1px solid rgba(200,168,75,0.15); padding:12px 16px; background:rgba(0,0,0,0.2); display:none; }
+.detail.open { display:block; }
+.dates-row { display:flex; gap:8px; flex-wrap:wrap; }
+.date-box { background:rgba(200,168,75,0.15); border:1px solid rgba(200,168,75,0.3); border-radius:8px; padding:8px 14px; text-align:center; }
+.date-box.empty { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); }
+.date-lbl { font-size:10px; color:#888; letter-spacing:1px; }
+.date-pts { font-size:20px; font-weight:bold; color:#c8a84b; }
+.date-pts.empty { color:#555; }
+.date-win { font-size:10px; color:#4bc87a; }
+.add-btn { width:100%; margin-top:16px; padding:14px; background:linear-gradient(135deg,#1a3a1a,#0d2137); border:2px dashed rgba(200,168,75,0.4); border-radius:12px; color:#c8a84b; font-size:14px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-family:inherit; }
+.reset-btn { width:100%; margin-top:8px; padding:10px; background:transparent; border:1px solid rgba(255,80,80,0.3); border-radius:12px; color:rgba(255,80,80,0.6); font-size:11px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; font-family:inherit; }
+.section { margin-bottom:20px; border-radius:12px; border:1px solid rgba(200,168,75,0.2); overflow:hidden; background:rgba(255,255,255,0.03); }
+.section-hdr { padding:12px 16px; background:rgba(200,168,75,0.1); border-bottom:1px solid rgba(200,168,75,0.2); font-size:14px; font-weight:bold; letter-spacing:2px; color:#c8a84b; }
+.section-row { display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.rule-box { margin-bottom:12px; padding:16px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(200,168,75,0.15); }
+.rule-title { font-weight:bold; color:#c8a84b; margin-bottom:6px; }
+.rule-body { color:#bbb; font-size:14px; }
+.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); align-items:flex-end; justify-content:center; z-index:100; }
+.modal-bg.open { display:flex; }
+.modal { background:#0d2137; border:1px solid rgba(200,168,75,0.3); border-radius:20px 20px 0 0; width:100%; max-width:700px; max-height:90vh; overflow-y:auto; padding:24px; }
+.modal-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.modal-title { color:#c8a84b; font-size:18px; }
+.close-btn { background:none; border:none; color:#888; font-size:24px; cursor:pointer; }
+.modal-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:10px 12px; background:rgba(255,255,255,0.04); border-radius:8px; }
+.modal-name { flex:1; font-size:14px; }
+.modal-chk { display:flex; align-items:center; gap:4px; font-size:12px; color:#888; }
+.modal-radio { display:flex; align-items:center; gap:4px; font-size:12px; color:#4bc87a; }
+.modal-input { width:64px; padding:6px 8px; border-radius:6px; background:rgba(0,0,0,0.4); border:1px solid rgba(200,168,75,0.3); color:#c8a84b; font-size:16px; text-align:center; }
+.save-btn { width:100%; margin-top:16px; padding:16px; background:linear-gradient(135deg,#c8a84b,#a8882b); border:none; border-radius:10px; color:#0a0f1e; font-size:16px; font-weight:bold; cursor:pointer; font-family:inherit; letter-spacing:2px; }
+.saved-toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1a3a1a; border:1px solid #4bc87a; color:#4bc87a; padding:10px 24px; border-radius:20px; font-size:13px; letter-spacing:1px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:200; }
+.saved-toast.show { opacity:1; }
+.footer { text-align:center; padding:20px; color:#444; font-size:11px; letter-spacing:1px; }
+.hidden { display:none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="copa">⛳ 2026 ⛳</div>
+  <h1>ACARREOS<br><span>HOLI CUP</span></h1>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="statFechas">0</div><div class="stat-lbl">FECHAS JUGADAS</div></div>
+    <div class="stat"><div class="stat-val" id="statPozo">$0</div><div class="stat-lbl">POZO ACUMULADO</div></div>
+    <div class="stat"><div class="stat-val" id="statClasif">0/0</div><div class="stat-lbl">CLASIFICADOS</div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('ranking')">🏆 Ranking</button>
+  <button class="tab" onclick="showTab('historial')">📅 Historial</button>
+  <button class="tab" onclick="showTab('reglas')">📋 Reglas</button>
+</div>
+
+<div class="content">
+  <div id="tab-ranking">
+    <div id="ranking-list"></div>
+    <button class="add-btn" onclick="openModal()">+ Agregar Fecha</button>
+    <button class="reset-btn" onclick="resetData()">↺ Reiniciar temporada</button>
+  </div>
+  <div id="tab-historial" class="hidden"></div>
+  <div id="tab-reglas" class="hidden">
+    <div class="rule-box"><div class="rule-title">💰 Cuota</div><div class="rule-body">$10 por jugador por fecha al pozo acumulado. Pot diario opcional de $10.</div></div>
+    <div class="rule-box"><div class="rule-title">🏆 Puntos</div><div class="rule-body">Top 8 resultados de cada jugador cuentan para el ranking final.</div></div>
+    <div class="rule-box"><div class="rule-title">📅 Mínimo</div><div class="rule-body">Mínimo 6 fechas para clasificar al final de temporada.</div></div>
+    <div class="rule-box"><div class="rule-title">🤝 Empates</div><div class="rule-body">Se suman los puntos de las posiciones empatadas y se dividen equitativamente.</div></div>
+    <div class="rule-box"><div class="rule-title">🚫 No-shows</div><div class="rule-body">El que no juega, no paga ni gana puntos.</div></div>
+    <div class="rule-box"><div class="rule-title">💵 Pozo</div><div class="rule-body">El pozo acumulado se reparte entre los mejores clasificados al final.</div></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title">📅 Nueva Fecha</div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-players"></div>
+    <button class="save-btn" onclick="saveDate()">GUARDAR FECHA</button>
+  </div>
+</div>
+
+<div class="saved-toast" id="toast">✓ Guardado</div>
+<div class="footer">ACARREOS HOLI CUP © 2026</div>
+
+<script>
+const STORAGE_KEY = 'holicup_2026';
+
+const defaultPlayers = [
+  { id:1,  name:"El Doctor",        results:[75,60],  paid:[10,10], wins:[0,0]  },
+  { id:2,  name:"Felipao",          results:[30,100], paid:[10,10], wins:[0,10] },
+  { id:3,  name:"Gio",              results:[100,0],  paid:[10,0],  wins:[10,0] },
+  { id:4,  name:"Diegolfa",         results:[60,40],  paid:[10,10], wins:[0,0]  },
+  { id:5,  name:"Felipe R",         results:[0,75],   paid:[0,10],  wins:[0,0]  },
+  { id:6,  name:"Ñaño",             results:[50,0],   paid:[10,0],  wins:[0,0]  },
+  { id:7,  name:"Daniel B",         results:[0,50],   paid:[0,10],  wins:[0,0]  },
+  { id:8,  name:"Garbimba Asesina", results:[30,0],   paid:[10,0],  wins:[0,0]  },
+  { id:9,  name:"Pistolas",         results:[30,0],   paid:[10,0],  wins:[0,0]  },
+  { id:10, name:"Juanca",           results:[0,30],   paid:[0,10],  wins:[0,0]  },
+  { id:11, name:"Paisa",            results:[10,0],   paid:[10,0],  wins:[0,0]  },
+  { id:12, name:"Nayibe",           results:[0,0],    paid:[0,0],   wins:[0,0]  },
+  { id:13, name:"Fercho",           results:[0,0],    paid:[0,0],   wins:[0,0]  },
+  { id:14, name:"El Nene",          results:[0,0],    paid:[0,0],   wins:[0,0]  },
+  { id:15, name:"Yerri",            results:[0,0],    paid:[0,0],   wins:[0,0]  },
+  { id:16, name:"Juan Rory",        results:[0,0],    paid:[0,0],   wins:[0,0]  },
+  { id:17, name:"Chapo",            results:[0,0],    paid:[0,0],   wins:[0,0]  },
+  { id:18, name:"Dani B",           results:[0,0],    paid:[0,0],   wins:[0,0]  },
+];
+
+function loadData() {
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPlayers));
+  } catch(e) {
+    return JSON.parse(JSON.stringify(defaultPlayers));
+  }
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+  var t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function resetData() {
+  if(confirm('¿Reiniciar toda la temporada? Se borrarán todas las fechas.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    players = JSON.parse(JSON.stringify(defaultPlayers));
+    renderAll();
+  }
+}
+
+var players = loadData();
+var medals = ["🥇","🥈","🥉"];
+var medalColors = ["gold","silver","bronze"];
+
+function calcTotal(results) {
+  return results.slice().sort(function(a,b){return b-a;}).slice(0,8).reduce(function(a,b){return a+b;},0);
+}
+
+function calcPot() {
+  return players.reduce(function(s,p){ return s+p.paid.reduce(function(a,b){return a+b;},0); },0);
+}
+
+function datesPlayed() { return players[0].results.length; }
+
+function renderStats() {
+  var dp = datesPlayed();
+  var pot = calcPot();
+  var ranked = getRanked();
+  var qualif = ranked.filter(function(p){ return p.results.filter(function(r){return r>0;}).length>=6; }).length;
+  document.getElementById('statFechas').textContent = dp;
+  document.getElementById('statPozo').textContent = '$'+pot;
+  document.getElementById('statClasif').textContent = qualif+'/'+players.length;
+}
+
+function getRanked() {
+  return players.slice().map(function(p){
+    return {id:p.id,name:p.name,results:p.results,paid:p.paid,wins:p.wins,total:calcTotal(p.results)};
+  }).sort(function(a,b){return b.total-a.total;});
+}
+
+function renderRanking() {
+  var ranked = getRanked();
+  var pos = 1;
+  var withPos = ranked.map(function(p,i){
+    if(i>0 && ranked[i-1].total!==p.total) pos=i+1;
+    return {id:p.id,name:p.name,results:p.results,paid:p.paid,wins:p.wins,total:p.total,pos:pos};
+  });
+  var html = '';
+  withPos.forEach(function(p){
+    var isTop = p.pos<=3;
+    var mc = isTop ? medalColors[p.pos-1] : '';
+    var datesIn = p.results.filter(function(r){return r>0;}).length;
+    var isQ = datesIn>=6;
+    var dp = datesPlayed();
+    var subHtml = datesIn+' fecha'+(datesIn!==1?'s':'')+' jugada'+(datesIn!==1?'s':'');
+    if(!isQ && datesIn>0) subHtml += ' <span class="need">· Necesita '+(6-datesIn)+' más</span>';
+    if(isQ) subHtml += ' <span class="ok">· ✓ Clasificado</span>';
+    var datesHtml = '';
+    for(var di=0;di<dp;di++){
+      var pts = p.results[di];
+      datesHtml += '<div class="date-box'+(pts>0?'':' empty')+'">';
+      datesHtml += '<div class="date-lbl">FECHA '+(di+1)+'</div>';
+      datesHtml += '<div class="date-pts'+(pts>0?'':' empty')+'">'+(pts>0?pts:'—')+'</div>';
+      if(p.wins[di]>0) datesHtml += '<div class="date-win">+$'+p.wins[di]+'</div>';
+      datesHtml += '</div>';
+    }
+    html += '<div class="player-card'+(mc?' '+mc:'')+'" onclick="toggleDetail('+p.id+')">';
+    html += '<div class="player-row">';
+    html += '<div class="pos'+(isTop?' top':'')+'">'+(isTop?medals[p.pos-1]:'#'+p.pos)+'</div>';
+    html += '<div style="flex:1"><div class="name'+(mc?' '+mc:'')+'">'+p.name+'</div>';
+    html += '<div class="sub">'+subHtml+'</div></div>';
+    html += '<div class="pts-col"><div class="pts-num'+(mc?' '+mc+'':'')+'">'+(p.total)+'</div>';
+    html += '<div class="pts-lbl">PTS</div></div>';
+    html += '<div class="arrow" id="arr-'+p.id+'">▼</div></div>';
+    html += '<div class="detail" id="detail-'+p.id+'"><div class="dates-row">'+datesHtml+'</div></div></div>';
+  });
+  document.getElementById('ranking-list').innerHTML = html;
+}
+
+function toggleDetail(id) {
+  var d = document.getElementById('detail-'+id);
+  var a = document.getElementById('arr-'+id);
+  d.classList.toggle('open');
+  a.textContent = d.classList.contains('open') ? '▲' : '▼';
+}
+
+function renderHistorial() {
+  var dp = datesPlayed();
+  var html = '';
+  for(var di=0;di<dp;di++){
+    var idx = di;
+    var dr = players.filter(function(p){return p.results[idx]>0;}).slice().sort(function(a,b){return b.results[idx]-a.results[idx];});
+    var rows = '';
+    dr.forEach(function(p,rank){
+      rows += '<div class="section-row">';
+      rows += '<span style="width:24px;color:'+(rank<3?['#FFD700','#C0C0C0','#CD7F32'][rank]:'#667')+';font-weight:bold">'+(rank<3?medals[rank]:(rank+1)+'.')+'</span>';
+      rows += '<span style="flex:1">'+p.name+'</span>';
+      rows += '<span style="color:#c8a84b;font-weight:bold">'+p.results[idx]+' pts</span>';
+      if(p.wins[idx]>0) rows += '<span style="font-size:11px;color:#4bc87a">🏆 Daily</span>';
+      rows += '</div>';
+    });
+    html += '<div class="section"><div class="section-hdr">📅 FECHA '+(di+1)+'</div>'+rows+'</div>';
+  }
+  document.getElementById('tab-historial').innerHTML = html || '<p style="color:#666;text-align:center;padding:40px">No hay fechas jugadas aún</p>';
+}
+
+function showTab(tab) {
+  ['ranking','historial','reglas'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.toggle('hidden', t!==tab);
+  });
+  document.querySelectorAll('.tab').forEach(function(el,i){
+    el.classList.toggle('active', ['ranking','historial','reglas'][i]===tab);
+  });
+  if(tab==='historial') renderHistorial();
+}
+
+function openModal() {
+  var dp = datesPlayed();
+  document.getElementById('modal-title').textContent = '📅 Fecha '+(dp+1);
+  var html = '';
+  players.forEach(function(p){
+    html += '<div class="modal-row">';
+    html += '<span class="modal-name">'+p.name+'</span>';
+    html += '<label class="modal-chk"><input type="checkbox" id="paid-'+p.id+'"> Pagó</label>';
+    html += '<label class="modal-radio"><input type="radio" name="winner" id="win-'+p.id+'" value="'+p.id+'"> 🏆</label>';
+    html += '<input type="number" min="0" placeholder="0" class="modal-input" id="pts-'+p.id+'">';
+    html += '</div>';
+  });
+  document.getElementById('modal-players').innerHTML = html;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function saveDate() {
+  var winner = document.querySelector('input[name="winner"]:checked');
+  var winnerId = winner ? parseInt(winner.value) : null;
+  players = players.map(function(p){
+    return {
+      id: p.id, name: p.name,
+      results: p.results.concat([parseInt(document.getElementById('pts-'+p.id).value)||0]),
+      paid:    p.paid.concat([document.getElementById('paid-'+p.id).checked?10:0]),
+      wins:    p.wins.concat([winnerId===p.id?10:0])
+    };
+  });
+  saveData();
+  closeModal();
+  renderAll();
+}
+
+function renderAll() { renderStats(); renderRanking(); }
+renderAll();
+</script>
+</body>
+</html>
