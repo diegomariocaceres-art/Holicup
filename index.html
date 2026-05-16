@@ -82,7 +82,7 @@ h1 span { color:#c8a84b; }
 .delete-date-btn:hover { color:rgba(255,80,80,0.9); border-color:rgba(255,80,80,0.5); }
 .saved-toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#1a3a1a; border:1px solid #4bc87a; color:#4bc87a; padding:10px 24px; border-radius:20px; font-size:13px; letter-spacing:1px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:200; }
 .saved-toast.show { opacity:1; }
-.error-toast { position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#3a1a1a; border:1px solid #c84b4b; color:#c84b4b; padding:10px 24px; border-radius:20px; font-size:13px; letter-spacing:1px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:200; }
+.error-toast { position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#3a1a1a; border:1px solid #c84b4b; color:#c84b4b; padding:10px 24px; border-radius:20px; font-size:13px; letter-spacing:1px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:200; white-space:nowrap; }
 .error-toast.show { opacity:1; }
 .footer { text-align:center; padding:20px; color:#444; font-size:11px; letter-spacing:1px; }
 .hidden { display:none; }
@@ -105,7 +105,7 @@ h1 span { color:#c8a84b; }
   </div>
   <div class="sync-badge">
     <div class="sync-dot" id="syncDot"></div>
-    <span id="syncLabel">DATOS EN LA NUBE</span>
+    <span id="syncLabel">CONECTANDO...</span>
   </div>
 </div>
 
@@ -144,31 +144,32 @@ h1 span { color:#c8a84b; }
 </div>
 
 <div class="saved-toast" id="toast">✓ Guardado en la nube</div>
-<div class="error-toast" id="errorToast">⚠ Error al guardar</div>
+<div class="error-toast" id="errorToast">⚠ Error</div>
 <div class="footer">ACARREOS HOLI CUP © 2026</div>
 
 <script>
-const STORAGE_KEY = 'holicup_2026_v2';
+var FIREBASE_URL = 'https://acarreos-holi-2026-default-rtdb.firebaseio.com';
+var DATA_PATH = '/holicup2026.json';
 
-const defaultPlayers = [
-  { id:1,  name:"El Doctor",        results:[75,60],  paid:[10,10], wins:[0,0]  },
-  { id:2,  name:"Felipao",          results:[30,100], paid:[10,10], wins:[0,10] },
-  { id:3,  name:"Gio",              results:[100,0],  paid:[10,0],  wins:[10,0] },
-  { id:4,  name:"Diegolfa",         results:[60,40],  paid:[10,10], wins:[0,0]  },
-  { id:5,  name:"Felipe R",         results:[0,75],   paid:[0,10],  wins:[0,0]  },
-  { id:6,  name:"Ñaño",             results:[50,0],   paid:[10,0],  wins:[0,0]  },
-  { id:7,  name:"Daniel B",         results:[0,50],   paid:[0,10],  wins:[0,0]  },
-  { id:8,  name:"Garbimba Asesina", results:[30,0],   paid:[10,0],  wins:[0,0]  },
-  { id:9,  name:"Pistolas",         results:[30,0],   paid:[10,0],  wins:[0,0]  },
-  { id:10, name:"Juanca",           results:[0,30],   paid:[0,10],  wins:[0,0]  },
-  { id:11, name:"Paisa",            results:[10,0],   paid:[10,0],  wins:[0,0]  },
-  { id:12, name:"Nayibe",           results:[0,0],    paid:[0,0],   wins:[0,0]  },
-  { id:13, name:"Fercho",           results:[0,0],    paid:[0,0],   wins:[0,0]  },
-  { id:14, name:"El Nene",          results:[0,0],    paid:[0,0],   wins:[0,0]  },
-  { id:15, name:"Yerri",            results:[0,0],    paid:[0,0],   wins:[0,0]  },
-  { id:16, name:"Juan Rory",        results:[0,0],    paid:[0,0],   wins:[0,0]  },
-  { id:17, name:"Chapo",            results:[0,0],    paid:[0,0],   wins:[0,0]  },
-  { id:18, name:"Dani B",           results:[0,0],    paid:[0,0],   wins:[0,0]  },
+var defaultPlayers = [
+  { id:1,  name:"El Doctor",        results:[75,60,50],    paid:[10,10,10], wins:[0,0,0]  },
+  { id:2,  name:"Felipao",          results:[30,100,0],    paid:[10,10,0],  wins:[0,10,0] },
+  { id:3,  name:"Gio",              results:[100,0,87.5],  paid:[10,0,10],  wins:[10,0,5] },
+  { id:4,  name:"Diegolfa",         results:[60,40,0],     paid:[10,10,0],  wins:[0,0,0]  },
+  { id:5,  name:"Felipe R",         results:[0,75,0],      paid:[0,10,0],   wins:[0,0,0]  },
+  { id:6,  name:"Ñaño",             results:[50,0,20],     paid:[10,0,10],  wins:[0,0,0]  },
+  { id:7,  name:"Daniel B",         results:[0,50,0],      paid:[0,10,0],   wins:[0,0,0]  },
+  { id:8,  name:"Garbimba Asesina", results:[30,0,30],     paid:[10,0,10],  wins:[0,0,0]  },
+  { id:9,  name:"Pistolas",         results:[30,0,0],      paid:[10,0,0],   wins:[0,0,0]  },
+  { id:10, name:"Juanca",           results:[0,30,0],      paid:[0,10,0],   wins:[0,0,0]  },
+  { id:11, name:"Paisa",            results:[10,0,40],     paid:[10,0,10],  wins:[0,0,0]  },
+  { id:12, name:"Nayibe",           results:[0,0,0],       paid:[0,0,0],    wins:[0,0,0]  },
+  { id:13, name:"Fercho",           results:[0,0,0],       paid:[0,0,0],    wins:[0,0,0]  },
+  { id:14, name:"El Nene",          results:[0,0,87.5],    paid:[0,0,10],   wins:[0,0,5]  },
+  { id:15, name:"Yerri",            results:[0,0,0],       paid:[0,0,0],    wins:[0,0,0]  },
+  { id:16, name:"Juan Rory",        results:[0,0,60],      paid:[0,0,10],   wins:[0,0,0]  },
+  { id:17, name:"Chapo",            results:[0,0,0],       paid:[0,0,0],    wins:[0,0,0]  },
+  { id:18, name:"Dani B",           results:[0,0,0],       paid:[0,0,0],    wins:[0,0,0]  },
 ];
 
 var players = [];
@@ -176,43 +177,58 @@ var medals = ["🥇","🥈","🥉"];
 var medalColors = ["gold","silver","bronze"];
 var isOnline = false;
 
+async function firebaseGet() {
+  var res = await fetch(FIREBASE_URL + DATA_PATH);
+  if (!res.ok) throw new Error('GET failed');
+  return await res.json();
+}
+
+async function firebasePut(data) {
+  var res = await fetch(FIREBASE_URL + DATA_PATH, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('PUT failed');
+  return true;
+}
+
 async function cloudLoad() {
   try {
-    const result = await window.storage.get(STORAGE_KEY, true);
-    if (result && result.value) {
-      players = JSON.parse(result.value);
-      isOnline = true;
+    var data = await firebaseGet();
+    if (data && Array.isArray(data)) {
+      players = data;
     } else {
       players = JSON.parse(JSON.stringify(defaultPlayers));
-      await cloudSave(false);
+      await firebasePut(players);
     }
+    isOnline = true;
   } catch(e) {
     isOnline = false;
-    var saved = localStorage.getItem(STORAGE_KEY);
+    var saved = localStorage.getItem('holicup_2026');
     players = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultPlayers));
   }
 }
 
-async function cloudSave(showToast = true) {
+async function cloudSave(showToast) {
+  if (showToast === undefined) showToast = true;
   try {
-    await window.storage.set(STORAGE_KEY, JSON.stringify(players), true);
+    await firebasePut(players);
     isOnline = true;
-    if (showToast) {
-      var t = document.getElementById('toast');
-      t.classList.add('show');
-      setTimeout(function(){ t.classList.remove('show'); }, 2500);
-    }
+    if (showToast) showToastMsg('toast', '✓ Guardado en la nube');
   } catch(e) {
     isOnline = false;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
-    if (showToast) {
-      var et = document.getElementById('errorToast');
-      et.textContent = '⚠ Guardado localmente (sin nube)';
-      et.classList.add('show');
-      setTimeout(function(){ et.classList.remove('show'); }, 3000);
-    }
+    localStorage.setItem('holicup_2026', JSON.stringify(players));
+    if (showToast) showToastMsg('errorToast', '⚠ Guardado local (sin internet)');
   }
   updateSyncBadge();
+}
+
+function showToastMsg(id, msg) {
+  var el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
 }
 
 function updateSyncBadge() {
@@ -220,7 +236,7 @@ function updateSyncBadge() {
   var lbl = document.getElementById('syncLabel');
   if (isOnline) {
     dot.classList.remove('offline');
-    lbl.textContent = 'DATOS EN LA NUBE';
+    lbl.textContent = 'EN VIVO 🔥';
   } else {
     dot.classList.add('offline');
     lbl.textContent = 'MODO LOCAL';
@@ -317,17 +333,17 @@ function renderHistorial() {
       rows += '<span style="width:24px;color:'+(rank<3?['#FFD700','#C0C0C0','#CD7F32'][rank]:'#667')+';font-weight:bold">'+(rank<3?medals[rank]:(rank+1)+'.')+'</span>';
       rows += '<span style="flex:1">'+p.name+'</span>';
       rows += '<span style="color:#c8a84b;font-weight:bold">'+p.results[idx]+' pts</span>';
-      if(p.wins[idx]>0) rows += '<span style="font-size:11px;color:#4bc87a">🏆 Daily</span>';
+      if(p.wins[idx]>0) rows += '<span style="font-size:11px;color:#4bc87a">🏆 Daily +$'+p.wins[idx]+'</span>';
       rows += '</div>';
     });
-    var deleteBtn = '<button class="delete-date-btn" onclick="event.stopPropagation();deleteDate('+(di)+')">✕ Borrar</button>';
+    var deleteBtn = '<button class="delete-date-btn" onclick="event.stopPropagation();deleteDate('+di+')">✕ Borrar</button>';
     html += '<div class="section"><div class="section-hdr"><span>📅 FECHA '+(di+1)+'</span>'+deleteBtn+'</div>'+rows+'</div>';
   }
   document.getElementById('tab-historial').innerHTML = html || '<p style="color:#666;text-align:center;padding:40px">No hay fechas jugadas aún</p>';
 }
 
 async function deleteDate(idx) {
-  if(!confirm('¿Borrar la Fecha '+(idx+1)+'? Esto afectará a TODOS los jugadores.')) return;
+  if(!confirm('¿Borrar la Fecha '+(idx+1)+'? Esto afectará a TODOS.')) return;
   players = players.map(function(p){
     return {
       id:p.id, name:p.name,
@@ -401,8 +417,15 @@ function renderAll() { renderStats(); renderRanking(); }
   renderAll();
 
   setInterval(async function() {
-    await cloudLoad();
-    renderAll();
+    try {
+      var data = await firebaseGet();
+      if (data && Array.isArray(data)) {
+        players = data;
+        isOnline = true;
+        updateSyncBadge();
+        renderAll();
+      }
+    } catch(e) { isOnline = false; updateSyncBadge(); }
   }, 30000);
 })();
 </script>
